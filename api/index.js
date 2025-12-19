@@ -5,8 +5,17 @@ let isConnected = false;
 const connectDB = async () => {
   if (isConnected) return;
 
-  await mongoose.connect(process.env.MONGO_URI);
-  isConnected = true;
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000, // Stop trying after 5 seconds
+    });
+    isConnected = true;
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.error("MongoDB Connection Error:", error);
+    throw error;
+  }
+  
 };
 
 // Schema
@@ -33,3 +42,4 @@ module.exports = async (req, res) => {
 
   res.status(405).json({ message: "Only GET allowed" });
 };
+
